@@ -1,3 +1,9 @@
+<?php
+     session_start();
+     if(isset($_SESSION['username'])){
+         header('location:post.php');
+     }
+?>
 <!doctype html>
 <html>
    <head>
@@ -18,7 +24,7 @@
                         <img class="logo" src="images/news.jpg">
                         <h3 class="heading">Admin</h3>
                         <!-- Form Start -->
-                        <form  action="" method ="POST">
+                        <form  action="<?php $_SERVER['PHP_SELF']; ?>" method ="POST">
                             <div class="form-group">
                                 <label>Username</label>
                                 <input type="text" name="username" class="form-control" placeholder="" required>
@@ -30,6 +36,28 @@
                             <input type="submit" name="login" class="btn btn-primary" value="login" />
                         </form>
                         <!-- /Form  End -->
+                        <?php
+                            if(isset($_POST['login'])){
+                                include "config.php";
+                                $uname=mysqli_real_escape_string($conn,$_POST['username']);
+                                $upass=md5($_POST['password']);
+                                $query="SELECT user_id,username,role FROM user WHERE username='{$uname}' AND password='{$upass}'";
+                                $result=mysqli_query($conn,$query) or die("QUERY Failed!");
+
+                                if(mysqli_num_rows($result)>0){
+                                    while($row=mysqli_fetch_assoc($result)){
+                                        session_start();
+                                        $_SESSION["username"]=$row['username'];
+                                        $_SESSION["user_id"]=$row['user_id'];
+                                        $_SESSION["user_role"]=$row['role'];
+                                        header('location:post.php');
+                                    }
+                                }else{
+                                    echo "<div class='alert alert-danger'>USERNAME AND PASSWORD DOES'NT MATCH!</div>";
+                                }
+
+                            }                        
+                        ?>
                     </div>
                 </div>
             </div>
