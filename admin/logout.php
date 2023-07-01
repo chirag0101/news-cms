@@ -1,13 +1,14 @@
+
 <?php
 
-    include "config.php";
-    
-    session_start();
-    
-    session_unset();
+include "config.php";
 
-    session_destroy();
+session_start();
 
-    header('location:index.php');
+session_unset();
+
+session_destroy();
+
+header("Location: {$hostname}/admin/");
 
 ?>

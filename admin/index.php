@@ -1,9 +1,12 @@
 <?php
-     session_start();
-     if(isset($_SESSION['username'])){
-         header('location:post.php');
-     }
+  include "config.php";
+  session_start();
+
+  if(isset($_SESSION["username"])){
+    header("Location: {$hostname}/admin/post.php");
+  }
 ?>
+
 <!doctype html>
 <html>
    <head>
@@ -37,26 +40,35 @@
                         </form>
                         <!-- /Form  End -->
                         <?php
-                            if(isset($_POST['login'])){
-                                include "config.php";
-                                $uname=mysqli_real_escape_string($conn,$_POST['username']);
-                                $upass=md5($_POST['password']);
-                                $query="SELECT user_id,username,role FROM user WHERE username='{$uname}' AND password='{$upass}'";
-                                $result=mysqli_query($conn,$query) or die("QUERY Failed!");
+                          if(isset($_POST['login'])){
+                            include "config.php";
+                            if(empty($_POST['username']) || empty($_POST['password'])){
+                              echo '<div class="alert alert-danger">All Fields must be entered.</div>';
+                              die();
+                            }else{
+                              $username = mysqli_real_escape_string($conn, $_POST['username']);
+                              $password = md5($_POST['password']);
 
-                                if(mysqli_num_rows($result)>0){
-                                    while($row=mysqli_fetch_assoc($result)){
-                                        session_start();
-                                        $_SESSION["username"]=$row['username'];
-                                        $_SESSION["user_id"]=$row['user_id'];
-                                        $_SESSION["user_role"]=$row['role'];
-                                        header('location:post.php');
-                                    }
-                                }else{
-                                    echo "<div class='alert alert-danger'>USERNAME AND PASSWORD DOES'NT MATCH!</div>";
+                              $sql = "SELECT user_id, username, role FROM user WHERE username = '{$username}' AND password= '{$password}'";
+
+                              $result = mysqli_query($conn, $sql) or die("Query Failed.");
+
+                              if(mysqli_num_rows($result) > 0){
+
+                                while($row = mysqli_fetch_assoc($result)){
+                                  session_start();
+                                  $_SESSION["username"] = $row['username'];
+                                  $_SESSION["user_id"] = $row['user_id'];
+                                  $_SESSION["user_role"] = $row['role'];
+
+                                  header("Location: {$hostname}/admin/post.php");
                                 }
 
-                            }                        
+                              }else{
+                              echo '<div class="alert alert-danger">Username and Password are not matched.</div>';
+                            }
+                          }
+                          }
                         ?>
                     </div>
                 </div>
